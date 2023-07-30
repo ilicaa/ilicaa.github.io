@@ -73,6 +73,7 @@ leadership:
       company: The Scout Association
       duration: September 2014 - July 2018
 portfolio:
+  enable: false
   filter:
     - label: Web Dev
       value: web-dev
