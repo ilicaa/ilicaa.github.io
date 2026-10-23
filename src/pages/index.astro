@@ -5,15 +5,28 @@ import ContactLinks from '../components/ContactLinks.astro';
 import LookingFor from '../components/LookingFor.astro';
 import Todo from '../components/Todo.astro';
 import { site } from '../lib/data';
-import { getProjectMap } from '../lib/projects';
+import { getProjectMap, isTodo } from '../lib/projects';
 
 const projects = await getProjectMap();
 const featured = site.featured.map((slug) => projects.get(slug)).filter((p) => p !== undefined);
 const [lead, ...rest] = featured;
 const { production, design, technical } = site.capabilities;
+
+// Structured data for search engines — only facts present in site.json.
+const sameAs = [site.links.linkedin, site.links.github].filter((u) => !isTodo(u));
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: site.name,
+  url: Astro.site?.href,
+  ...(isTodo(site.email) ? {} : { email: `mailto:${site.email}` }),
+  ...(sameAs.length ? { sameAs } : {}),
+  address: { "@type": "PostalAddress", addressLocality: site.location.split(",")[0].trim() },
+};
 ---
 
 <Base>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(personLd)} />
   <section class="hero wrap" aria-labelledby="headline">
     <p class="label eyebrow">{site.lookingFor.primary.join(' · ')}</p>
     <h1 id="headline"><Todo value={site.headline} /></h1>

@@ -181,7 +181,7 @@ a:hover {
 .button--ghost {
   background: transparent;
   color: var(--c-text);
-  border-color: var(--c-rule);
+  border-color: var(--c-border-strong);
 }
 .button--ghost:hover {
   background: var(--c-surface);
