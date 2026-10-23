@@ -14,7 +14,7 @@
       { "name": "GDD writing", "projects": ["panic-at-the-server"] },
       { "name": "Core loop and systems design", "projects": ["panic-at-the-server", "anima-1"] },
       { "name": "Resource and combat balance: stamina, sanity, battery", "projects": ["anima-1", "panic-at-the-server"] },
-      { "name": "Narrative design", "projects": ["hirdavat"] },
+      { "name": "Narrative design", "projects": [] },
       { "name": "One-pagers and pitch documents", "projects": ["panic-at-the-server", "genai-npc"] },
       { "name": "Competitive analysis and positioning", "projects": ["panic-at-the-server", "anima-1"] },
       { "name": "Adaptive and AI-driven game design", "projects": ["genai-npc", "anima-1"] }
