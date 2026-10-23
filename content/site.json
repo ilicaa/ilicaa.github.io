@@ -1,0 +1,43 @@
+{
+  "name": "Yusuf Arda Ilıca",
+  "headline": "TODO: one-line positioning headline (e.g. what you do + for whom)",
+  "intro": "TODO: 2–3 sentence intro: who you are, what you're applying for, what makes you useful to a team.",
+  "location": "Ankara, Türkiye",
+  "lookingFor": {
+    "primary": ["Junior Producer", "Game Designer"],
+    "secondary": ["Technical Designer", "QA", "AI/backend engineering"]
+  },
+  "email": "ilicaarda@gmail.com",
+  "links": {
+    "linkedin": "TODO: https://www.linkedin.com/in/your-handle",
+    "github": "TODO: confirm https://github.com/ilicaa"
+  },
+  "featured": ["genai-npc", "anima-1", "panic-at-the-server"],
+  "capabilities": {
+    "production": [
+      "TODO: production capability #1 (one line, concrete)",
+      "TODO: production capability #2"
+    ],
+    "design": [
+      "TODO: design capability #1 (one line, concrete)",
+      "TODO: design capability #2"
+    ],
+    "technical": "TODO: one short line on technical/QA strengths"
+  },
+  "about": [
+    "TODO: short personal paragraph."
+  ],
+  "education": [
+    {
+      "degree": "MSc (non-thesis), Computer Animation and Game Technologies",
+      "school": "Hacettepe University",
+      "dates": "In progress"
+    },
+    {
+      "degree": "BSc, Computer Engineering",
+      "school": "Atılım University",
+      "dates": "2026"
+    }
+  ],
+  "seoDescription": "TODO: ~150-character description for search results and link previews."
+}

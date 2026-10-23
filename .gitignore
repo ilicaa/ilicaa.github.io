@@ -1,0 +1,28 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# local audits
+.lighthouse/
+
+# local Claude Code settings
+.claude/settings.local.json
+
+# private working notes: kept out of the public repo (remove this line to version them)
+content/projects-notes/
