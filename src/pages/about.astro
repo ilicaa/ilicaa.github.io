@@ -1,0 +1,137 @@
+---
+import Base from '../layouts/Base.astro';
+import ContactLinks from '../components/ContactLinks.astro';
+import Todo from '../components/Todo.astro';
+import { site } from '../lib/data';
+import { isTodo } from '../lib/projects';
+
+const { primary, secondary, note } = site.lookingFor;
+---
+
+<Base title="About & contact" description={`About ${site.name}: background, what I'm looking for, and how to reach me.`}>
+  <div class="wrap layout">
+    <header class="head">
+      <h1>About</h1>
+      <p class="label">{site.location}</p>
+    </header>
+
+    <div class="main">
+      <section aria-label="Introduction" class="bio">
+        {site.about.map((p) => <p><Todo value={p} /></p>)}
+      </section>
+
+      <section aria-labelledby="looking-heading" class="block">
+        <h2 id="looking-heading">What I'm looking for</h2>
+        <p class="roles">{primary.join(' · ')}</p>
+        {secondary.length > 0 && <p class="muted">Also open to: {secondary.join(', ')}.</p>}
+        {note && <p class="muted">{note}</p>}
+      </section>
+
+      <section aria-labelledby="education-heading" class="block">
+        <h2 id="education-heading">Education</h2>
+        <ul role="list" class="education">
+          {
+            site.education.map((e) => (
+              <li>
+                <p class="degree">{e.degree}</p>
+                <p class="muted">
+                  {e.school} · {e.dates}
+                </p>
+                {e.note && <p class="muted">{e.note}</p>}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="contact-heading" class="block contact" id="contact">
+        <h2 id="contact-heading">Contact</h2>
+        <p>The fastest way to reach me is email.</p>
+        {
+          isTodo(site.email) ? (
+            <mark class="todo">{site.email}</mark>
+          ) : (
+            <a class="email" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+          )
+        }
+        <ContactLinks class="links" omitEmail />
+      </section>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .layout {
+    display: grid;
+    gap: var(--space-xl) var(--space-2xl);
+    padding-block-start: var(--space-2xl);
+  }
+  @media (min-width: 56rem) {
+    .layout {
+      grid-template-columns: minmax(12rem, 1fr) minmax(0, 2.2fr);
+    }
+    .head {
+      position: sticky;
+      top: var(--space-l);
+      align-self: start;
+    }
+  }
+  .head .label {
+    margin-block-start: var(--space-xs);
+  }
+  .main {
+    max-width: var(--measure);
+  }
+  .bio {
+    display: grid;
+    gap: 1em;
+    font-size: var(--step-1);
+    line-height: 1.55;
+  }
+  .block {
+    margin-block-start: var(--space-2xl);
+    padding-block-start: var(--space-m);
+    border-top: 1px solid var(--c-rule);
+  }
+  .block h2 {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-block-end: var(--space-s);
+  }
+  .roles {
+    font-family: var(--ff-display);
+    font-size: var(--step-3);
+    line-height: var(--lh-snug);
+  }
+  .muted {
+    margin-block-start: var(--space-2xs);
+    color: var(--c-muted);
+  }
+  .education {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .degree {
+    font-weight: 600;
+  }
+  .education .muted {
+    margin-block-start: 0;
+  }
+  .email {
+    display: inline-block;
+    margin-block-start: var(--space-xs);
+    font-family: var(--ff-display);
+    font-size: var(--step-3);
+    line-height: var(--lh-snug);
+    word-break: break-all;
+  }
+  .contact :global(.links) {
+    margin-block-start: var(--space-s);
+  }
+</style>

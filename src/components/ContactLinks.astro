@@ -5,11 +5,13 @@ import { isTodo } from '../lib/projects';
 
 interface Props {
   class?: string;
+  /** Leave out the email link (when the address is already shown in full). */
+  omitEmail?: boolean;
 }
-const { class: className } = Astro.props;
+const { class: className, omitEmail = false } = Astro.props;
 
 const items = [
-  { label: 'Email', href: isTodo(site.email) ? site.email : `mailto:${site.email}`, external: false },
+  ...(omitEmail ? [] : [{ label: 'Email', href: isTodo(site.email) ? site.email : `mailto:${site.email}`, external: false }]),
   { label: 'LinkedIn', href: site.links.linkedin, external: true },
   { label: 'GitHub', href: site.links.github, external: true },
 ];
