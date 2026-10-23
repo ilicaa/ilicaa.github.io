@@ -1,11 +1,48 @@
 {
-  "intro": "TODO: one short sentence introducing the skills page.",
+  "intro": "This page shows what i can do and what i have done in the past. It is a collection of my skills, grouped by category.",
   "groups": {
-    "production": [],
-    "design": [],
-    "technical": [],
-    "qa": []
+    "production": [
+      { "name": "Sprint planning and roadmaps", "projects": ["anima-1", "genai-npc"] },
+      { "name": "Jira backlog management: epics, stories and estimates", "projects": ["anima-1"] },
+      { "name": "Scope-versus-capacity planning, with a fixed cut order", "projects": ["anima-1"] },
+      { "name": "Progress tracking and reporting", "projects": ["genai-npc"] },
+      { "name": "Risk management and fallback planning", "projects": ["anima-1", "genai-npc"] },
+      { "name": "Leading a small team", "projects": ["genai-npc", "anima-1"] },
+      { "name": "Coordinating people and events (IEEE student branch)", "projects": [] }
+    ],
+    "design": [
+      { "name": "GDD writing", "projects": ["panic-at-the-server"] },
+      { "name": "Core loop and systems design", "projects": ["panic-at-the-server", "anima-1"] },
+      { "name": "Resource and combat balance: stamina, sanity, battery", "projects": ["anima-1", "panic-at-the-server"] },
+      { "name": "Narrative design", "projects": ["hirdavat"] },
+      { "name": "One-pagers and pitch documents", "projects": ["panic-at-the-server", "genai-npc"] },
+      { "name": "Competitive analysis and positioning", "projects": ["panic-at-the-server", "anima-1"] },
+      { "name": "Adaptive and AI-driven game design", "projects": ["genai-npc", "anima-1"] }
+    ],
+    "technical": [
+      { "name": "Python", "level": "Daily use", "projects": ["genai-npc"] },
+      { "name": "FastAPI", "level": "Daily use", "projects": ["genai-npc"] },
+      { "name": "Vector databases and RAG (Qdrant)", "level": "Daily use", "projects": ["genai-npc"] },
+      { "name": "Git", "level": "Daily use", "projects": [] },
+      { "name": "C#", "level": "Working knowledge", "projects": ["genai-npc"] },
+      { "name": "C/C++", "level": "Working knowledge", "projects": [] },
+      { "name": "Hugging Face and LLM integration", "level": "Working knowledge", "projects": ["genai-npc"] },
+      { "name": "Linux", "level": "Working knowledge", "projects": ["panic-at-the-server"] },
+      { "name": "Unity", "level": "Familiar", "projects": ["genai-npc"] },
+      { "name": "Unreal Engine", "level": "Familiar", "projects": ["anima-1"] },
+      { "name": "Docker", "level": "Familiar", "projects": [] }
+    ],
+    "qa": [
+      { "name": "Test planning and test cases", "projects": ["genai-npc"] },
+      { "name": "API testing with pytest", "projects": ["genai-npc"] },
+      { "name": "Playtest reports", "projects": [] }
+    ]
   },
-  "languages": [],
+  "languages": [
+    { "name": "English", "level": "TOEFL iBT 90" },
+    { "name": "German", "level": "A2" },
+    { "name": "French", "level": "A1" },
+    { "name": "Turkish", "level": "Native" }
+  ],
   "certifications": []
 }

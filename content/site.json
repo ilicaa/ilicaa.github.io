@@ -1,7 +1,7 @@
 {
   "name": "Yusuf Arda Ilıca",
-  "headline": "TODO: one-line positioning headline (e.g. what you do + for whom)",
-  "intro": "TODO: 2–3 sentence intro: who you are, what you're applying for, what makes you useful to a team.",
+  "headline": "Junior producer and game designer, with an engineer's toolkit.",
+  "intro": "I'm a computer engineering graduate now studying computer animation and game technologies at Hacettepe University. I led a team through a senior project, an LLM-driven NPC framework, and I'm producing Anima-1. I'm looking for a junior producer or game designer role where I can keep teams on schedule and make design decisions visible.",
   "location": "Ankara, Türkiye",
   "lookingFor": {
     "primary": ["Junior Producer", "Game Designer"],
@@ -9,23 +9,23 @@
   },
   "email": "ilicaarda@gmail.com",
   "links": {
-    "linkedin": "TODO: https://www.linkedin.com/in/your-handle",
-    "github": "TODO: confirm https://github.com/ilicaa"
+    "linkedin": "https://www.linkedin.com/in/ardailica",
+    "github": "https://github.com/ilicaa"
   },
   "featured": ["genai-npc", "anima-1", "panic-at-the-server"],
   "capabilities": {
     "production": [
-      "TODO: production capability #1 (one line, concrete)",
-      "TODO: production capability #2"
+      "Plan in weekly milestones and report at monthly reviews, as I did leading a senior-project team.",
+      "Coordinate people and events: three years running an IEEE student branch, from coordinator to chair."
     ],
     "design": [
-      "TODO: design capability #1 (one line, concrete)",
-      "TODO: design capability #2"
+      "Design gameplay systems that pull against each other, as in the flashlight-and-sanity loop of Pan!c at the Server.",
+      "Write GDDs and narrative design a team can build from."
     ],
-    "technical": "TODO: one short line on technical/QA strengths"
+    "technical": "Unity (C#), Unreal (C++),Python and FastAPI, vector search and RAG; I also write test cases and playtest reports."
   },
   "about": [
-    "TODO: short personal paragraph."
+    "I’m a computer engineer who ended up drawn to the planning side of games: scoping the work, writing the design down, and keeping a team moving. I like long-form RPGs, and I can follow a backend design as well as a GDD, so I’m comfortable talking to programmers as well as designers"
   ],
   "education": [
     {
@@ -39,5 +39,5 @@
       "dates": "2026"
     }
   ],
-  "seoDescription": "TODO: ~150-character description for search results and link previews."
+  "seoDescription": "Portfolio of Yusuf Arda Ilıca, a junior producer and game designer. Case studies, design documents and production plans from team game projects."
 }
