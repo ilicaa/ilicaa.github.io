@@ -16,7 +16,8 @@ const subsets = (/** @type {string} */ file, /** @type {Record<string, any>} */ 
 export default defineConfig({
   site: 'https://ilicaa.github.io',
   trailingSlash: 'ignore',
-  build: { format: 'directory' },
+  // Pages are small: inlining their CSS removes a render-blocking request (faster first paint on mobile).
+  build: { format: 'directory', inlineStylesheets: 'always' },
   compressHTML: true,
   integrations: [contentGuard(), sitemap()],
   image: {
