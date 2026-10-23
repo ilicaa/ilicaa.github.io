@@ -1,0 +1,234 @@
+---
+// Generated from content/skills.json. Renders only what's in the file — no inferred skills or levels.
+import Base from '../layouts/Base.astro';
+import LookingFor from '../components/LookingFor.astro';
+import Todo from '../components/Todo.astro';
+import { skills, type Skill } from '../lib/data';
+import { getProjectMap, projectUrl } from '../lib/projects';
+
+const projects = await getProjectMap();
+
+const GROUPS = [
+  { key: 'production', title: 'Production' },
+  { key: 'design', title: 'Game Design' },
+  { key: 'technical', title: 'Technical' },
+  { key: 'qa', title: 'QA' },
+] as const;
+
+// Links to draft projects are dropped in production (the content guard warns about them).
+const withEvidence = (s: Skill) => ({
+  ...s,
+  evidence: s.projects.flatMap((slug) => {
+    const p = projects.get(slug);
+    return p ? [{ href: projectUrl(slug), title: p.data.title }] : [];
+  }),
+});
+
+const groups = GROUPS.map((g) => ({ ...g, items: skills.groups[g.key].map(withEvidence) })).filter((g) => g.items.length > 0);
+const { languages, certifications } = skills;
+---
+
+<Base title="Skills" description="Production, game design, technical and QA skills, each linked to the projects where they were used.">
+  <header class="wrap intro">
+    <h1>Skills</h1>
+    <p class="lede"><Todo value={skills.intro} /></p>
+    <p class="key label">
+      <span class="key-item"><span class="swatch evidence" aria-hidden="true"></span> Linked to a project</span>
+      <span class="key-item"><span class="swatch quiet" aria-hidden="true"></span> No case study yet</span>
+    </p>
+  </header>
+
+  {groups.length === 0 && <p class="wrap"><mark class="todo">TODO: add skills to content/skills.json (see README)</mark></p>}
+
+  <div class="wrap groups">
+    {
+      groups.map((g) => (
+        <section class="group" aria-labelledby={`skills-${g.key}`}>
+          <h2 id={`skills-${g.key}`}>{g.title}</h2>
+          <ul role="list" class="skills">
+            {g.items.map((s) => (
+              <li class:list={['skill', s.evidence.length ? 'evidence' : 'quiet']}>
+                <span class="name">{s.name}</span>
+                {s.level && <span class="level">{s.level}</span>}
+                {s.evidence.length > 0 && (
+                  <span class="used">
+                    <span class="visually-hidden">Used in: </span>
+                    {s.evidence.map((e) => (
+                      <a href={e.href}>{e.title}</a>
+                    ))}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+
+  {
+    (languages.length > 0 || certifications.length > 0) && (
+      <div class="wrap extras">
+        {languages.length > 0 && (
+          <section aria-labelledby="skills-languages">
+            <h2 id="skills-languages" class="label">
+              Languages
+            </h2>
+            <ul role="list" class="inline-list">
+              {languages.map((l) => (
+                <li>
+                  {l.name}
+                  {l.level && <span class="muted"> — {l.level}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {certifications.length > 0 && (
+          <section aria-labelledby="skills-certs">
+            <h2 id="skills-certs" class="label">
+              Certifications
+            </h2>
+            <ul role="list" class="inline-list">
+              {certifications.map((c) => (
+                <li>
+                  {c.url ? <a href={c.url}>{c.name}</a> : c.name}
+                  {(c.issuer || c.year) && <span class="muted"> — {[c.issuer, c.year].filter(Boolean).join(', ')}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    )
+  }
+
+  <LookingFor />
+</Base>
+
+<style>
+  .intro {
+    padding-block: var(--space-2xl) var(--space-l);
+  }
+  .lede {
+    margin-block-start: var(--space-s);
+    max-width: var(--measure);
+    color: var(--c-muted);
+    font-size: var(--step-1);
+  }
+  .key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-l);
+    margin-block-start: var(--space-m);
+  }
+  .key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+  .swatch {
+    width: 1.1em;
+    height: 0.8em;
+    border-radius: 2px;
+  }
+  .swatch.evidence {
+    border: 1px solid var(--c-accent);
+    background: var(--c-surface);
+  }
+  .swatch.quiet {
+    border: 1px dashed var(--c-rule);
+  }
+
+  .groups {
+    display: grid;
+    gap: var(--space-2xl) var(--space-2xl);
+    margin-block-start: var(--space-xl);
+  }
+  @media (min-width: 56rem) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .group h2 {
+    padding-block-end: var(--space-xs);
+    margin-block-end: var(--space-m);
+    border-bottom: 1px solid var(--c-rule);
+    font-size: var(--step-3);
+    font-weight: 400;
+  }
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+  .skill {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.15em 0.6em;
+    padding: 0.4em 0.75em;
+    border-radius: var(--radius-s);
+    line-height: 1.35;
+  }
+  .skill.evidence {
+    border: 1px solid color-mix(in srgb, var(--c-accent) 55%, var(--c-rule));
+    background: var(--c-surface);
+  }
+  .skill.evidence .name {
+    font-weight: 600;
+  }
+  .skill.quiet {
+    border: 1px dashed var(--c-rule);
+    color: var(--c-muted);
+  }
+  .level {
+    font-family: var(--ff-mono);
+    font-size: 0.75em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .used {
+    flex-basis: 100%;
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+  .used a {
+    color: var(--c-accent-strong);
+    padding-block: 0.15em;
+  }
+  .used a:not(:last-child)::after {
+    content: ",";
+    display: inline-block;
+    margin-inline-end: 0.4em;
+    color: var(--c-muted);
+  }
+
+  .extras {
+    display: grid;
+    gap: var(--space-l) var(--space-2xl);
+    margin-block-start: var(--space-2xl);
+    padding-block-start: var(--space-l);
+    border-top: 1px solid var(--c-rule);
+  }
+  @media (min-width: 56rem) {
+    .extras {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .extras h2 {
+    margin-block-end: var(--space-2xs);
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+  }
+  .inline-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-l);
+  }
+  .muted {
+    color: var(--c-muted);
+  }
+</style>

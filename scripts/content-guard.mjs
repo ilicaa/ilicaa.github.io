@@ -99,6 +99,9 @@ export function checkContent(root) {
   }
 
   if (skills?.groups) {
+    if (Object.values(skills.groups).every((items) => !items?.length)) {
+      todos.push({ file: 'content/skills.json', line: 1, text: 'TODO: no skills listed yet (the Skills page would be empty)' });
+    }
     for (const [group, items] of Object.entries(skills.groups)) {
       for (const skill of items ?? []) {
         for (const slug of skill.projects ?? []) checkSlug(slug, `content/skills.json (${group} › ${skill.name})`);
