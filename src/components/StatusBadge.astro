@@ -1,0 +1,52 @@
+---
+// Status is always spelled out; the marker shape is a secondary cue, never the only one.
+import Todo from './Todo.astro';
+import { isTodo } from '../lib/projects';
+
+interface Props {
+  status: string;
+}
+const { status } = Astro.props;
+const kind = isTodo(status) ? 'todo' : status.toLowerCase().replace(/\s+/g, '-');
+---
+
+<span class="status" data-status={kind}>
+  <span class="marker" aria-hidden="true"></span>
+  <span class="visually-hidden">Status:</span>
+  <Todo value={status} />
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-text);
+  }
+  .marker {
+    flex: none;
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-accent);
+  }
+  [data-status='shipped'] .marker {
+    background: var(--c-accent);
+  }
+  [data-status='prototype'] .marker {
+    background: radial-gradient(circle, var(--c-accent) 0 35%, transparent 40%);
+  }
+  [data-status='in-development'] .marker {
+    background: linear-gradient(90deg, var(--c-accent) 50%, transparent 50%);
+  }
+  [data-status='concept'] .marker,
+  [data-status='todo'] .marker {
+    border-color: var(--c-muted);
+    border-style: dashed;
+  }
+</style>

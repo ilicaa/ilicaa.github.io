@@ -1,0 +1,12 @@
+---
+// Renders a value, or — if it's a "TODO…" placeholder — a loud highlighted box.
+// Production builds never get here with a TODO: the content guard fails the build first.
+import { isTodo } from '../lib/projects';
+
+interface Props {
+  value: string | number | undefined;
+}
+const { value } = Astro.props;
+---
+
+{isTodo(value) ? <mark class="todo">{value}</mark> : value}

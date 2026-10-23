@@ -1,15 +1,153 @@
 ---
-// Temporary page; replaced by the real Home in step 2.
-import '../styles/global.css';
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ContactLinks from '../components/ContactLinks.astro';
+import LookingFor from '../components/LookingFor.astro';
+import Todo from '../components/Todo.astro';
 import { site } from '../lib/data';
+import { getProjectMap } from '../lib/projects';
+
+const projects = await getProjectMap();
+const featured = site.featured.map((slug) => projects.get(slug)).filter((p) => p !== undefined);
+const [lead, ...rest] = featured;
+const { production, design, technical } = site.capabilities;
 ---
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{site.name}</title>
-  </head>
-  <body>
-    <main class="wrap"><h1>{site.name}</h1></main>
-  </body>
-</html>
+
+<Base>
+  <section class="hero wrap" aria-labelledby="headline">
+    <p class="label eyebrow">{site.lookingFor.primary.join(' · ')}</p>
+    <h1 id="headline"><Todo value={site.headline} /></h1>
+    <p class="intro"><Todo value={site.intro} /></p>
+    <div class="actions">
+      <a class="button" href="/projects/">View projects <span aria-hidden="true">→</span></a>
+      <ContactLinks />
+    </div>
+  </section>
+
+  {
+    lead && (
+      <section class="wrap featured" aria-labelledby="featured-heading">
+        <h2 id="featured-heading" class="label rule-heading">
+          Selected work
+        </h2>
+        <ProjectCard project={lead} variant="feature" eager />
+        {rest.length > 0 && (
+          <div class="grid">
+            {rest.map((p) => (
+              <div class="reveal">
+                <ProjectCard project={p} />
+              </div>
+            ))}
+          </div>
+        )}
+        <p class="more">
+          <a href="/projects/">All projects by track <span aria-hidden="true">→</span></a>
+        </p>
+      </section>
+    )
+  }
+
+  <section class="wrap capabilities" aria-labelledby="capabilities-heading">
+    <h2 id="capabilities-heading" class="label rule-heading">What I can do for a team</h2>
+    <div class="cap-grid">
+      <div class="cap reveal">
+        <h3>Production</h3>
+        <ul role="list">{production.map((item) => <li><Todo value={item} /></li>)}</ul>
+      </div>
+      <div class="cap reveal">
+        <h3>Design</h3>
+        <ul role="list">{design.map((item) => <li><Todo value={item} /></li>)}</ul>
+      </div>
+    </div>
+    {
+      technical && (
+        <p class="technical">
+          <span class="label">Technical &amp; QA</span>
+          <span><Todo value={technical} /></span>
+        </p>
+      )
+    }
+    <p class="more"><a href="/skills/">Skills, and where I've used them <span aria-hidden="true">→</span></a></p>
+  </section>
+
+  <LookingFor />
+</Base>
+
+<style>
+  .hero {
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+  .eyebrow {
+    color: var(--c-accent);
+  }
+  .hero h1 {
+    margin-block-start: var(--space-s);
+    max-width: 18ch;
+  }
+  .intro {
+    margin-block-start: var(--space-m);
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--c-muted);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s) var(--space-l);
+    margin-block-start: var(--space-l);
+  }
+
+  .featured,
+  .capabilities {
+    margin-block-start: var(--space-2xl);
+  }
+  .featured > h2,
+  .capabilities > h2 {
+    margin-block-end: var(--space-l);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-xl) var(--space-l);
+    margin-block-start: var(--space-xl);
+  }
+  @media (min-width: 40rem) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .more {
+    margin-block-start: var(--space-l);
+  }
+
+  .cap-grid {
+    display: grid;
+    gap: var(--space-xl) var(--space-2xl);
+  }
+  @media (min-width: 48rem) {
+    .cap-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .cap h3 {
+    font-size: var(--step-3);
+    font-weight: 400;
+  }
+  .cap ul {
+    margin-block-start: var(--space-s);
+    border-top: 1px solid var(--c-rule);
+  }
+  .cap li {
+    padding-block: var(--space-xs);
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .technical {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+    align-items: baseline;
+    margin-block-start: var(--space-xl);
+    color: var(--c-muted);
+  }
+</style>

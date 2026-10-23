@@ -1,0 +1,52 @@
+---
+import { site } from '../lib/data';
+import { isTodo } from '../lib/projects';
+
+const { primary, secondary, note } = site.lookingFor;
+---
+
+<aside class="looking-for" aria-labelledby="looking-for-heading">
+  <div class="wrap inner">
+    <div>
+      <h2 id="looking-for-heading" class="label">Looking for</h2>
+      <p class="roles">{primary.join(' · ')}</p>
+      {secondary.length > 0 && <p class="secondary">Also open to: {secondary.join(', ')}</p>}
+      {note && <p class="secondary">{note}</p>}
+    </div>
+    {
+      isTodo(site.email) ? (
+        <mark class="todo">{site.email}</mark>
+      ) : (
+        <a class="button" href={`mailto:${site.email}`}>
+          Get in touch
+        </a>
+      )
+    }
+  </div>
+</aside>
+
+<style>
+  .looking-for {
+    margin-block-start: var(--space-3xl);
+    border-block: 1px solid var(--c-rule);
+    background: var(--c-surface);
+  }
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-block: var(--space-xl);
+  }
+  .roles {
+    margin-block-start: var(--space-2xs);
+    font-family: var(--ff-display);
+    font-size: var(--step-3);
+    line-height: var(--lh-snug);
+  }
+  .secondary {
+    margin-block-start: var(--space-2xs);
+    color: var(--c-muted);
+  }
+</style>

@@ -231,3 +231,8 @@ a:hover {
     scroll-behavior: auto !important;
   }
 }
+
+/* A page that ends with the Looking-for strip sits flush against the footer. */
+main:has(> .looking-for:last-child) + .site-footer {
+  margin-block-start: 0;
+}

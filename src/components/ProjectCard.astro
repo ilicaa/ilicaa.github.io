@@ -1,0 +1,185 @@
+---
+import { Picture } from 'astro:assets';
+import StatusBadge from './StatusBadge.astro';
+import Todo from './Todo.astro';
+import { projectUrl, type Project } from '../lib/projects';
+
+interface Props {
+  project: Project;
+  /** `feature` = wide horizontal card used for the first featured project. */
+  variant?: 'feature' | 'default';
+  headingLevel?: 'h2' | 'h3';
+  /** Show team size and tags (projects index). */
+  details?: boolean;
+  /** Eager-load the thumbnail (first card above the fold). */
+  eager?: boolean;
+}
+
+const { project, variant = 'default', headingLevel: H = 'h3', details = false, eager = false } = Astro.props;
+const { title, pitch, role, status, thumbnail, teamSize, tags, draft } = project.data;
+const sizes =
+  variant === 'feature'
+    ? '(min-width: 64rem) 44rem, (min-width: 40rem) 55vw, 100vw'
+    : '(min-width: 64rem) 36rem, (min-width: 40rem) 50vw, 100vw';
+---
+
+<article class:list={['card', `card--${variant}`]}>
+  <div class="media">
+    {
+      thumbnail ? (
+        <Picture
+          src={thumbnail.src}
+          alt={thumbnail.alt}
+          formats={['avif', 'webp']}
+          widths={[400, 640, 960, 1280]}
+          sizes={sizes}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : undefined}
+        />
+      ) : (
+        <div class="placeholder" aria-hidden="true">
+          <span>{title}</span>
+        </div>
+      )
+    }
+  </div>
+  <div class="body">
+    <H class="title">
+      <a href={projectUrl(project.id)}>{title}</a>
+    </H>
+    <p class="pitch"><Todo value={pitch} /></p>
+    <ul role="list" class="meta">
+      <li class="role"><span class="visually-hidden">Role:</span><Todo value={role} /></li>
+      <li><StatusBadge status={status} /></li>
+      {
+        details && teamSize !== undefined && (
+          <li class="team">
+            Team of <Todo value={teamSize} />
+          </li>
+        )
+      }
+      {draft && <li class="todo">Draft — hidden in production</li>}
+    </ul>
+    {
+      details && tags.length > 0 && (
+        <ul role="list" class="tags" aria-label="Tags">
+          {tags.map((t) => (
+            <li>{t}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: grid;
+    gap: var(--space-s);
+    align-content: start;
+  }
+  .media {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-m);
+    background: var(--c-surface);
+    outline: 1px solid var(--c-rule);
+    outline-offset: -1px;
+  }
+  .media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--dur-med) var(--ease-out);
+  }
+  .placeholder {
+    display: grid;
+    place-items: end start;
+    height: 100%;
+    padding: var(--space-m);
+    background:
+      linear-gradient(var(--c-rule) 1px, transparent 1px) 0 0 / 100% 2.5rem,
+      var(--c-surface);
+  }
+  .placeholder span {
+    font-family: var(--ff-display);
+    font-size: var(--step-3);
+    line-height: var(--lh-tight);
+    color: var(--c-muted);
+  }
+  .title {
+    font-size: var(--step-2);
+  }
+  .title a {
+    text-decoration: none;
+  }
+  /* Whole card is clickable through the title link (one tab stop, one accessible name). */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-m);
+  }
+  .title a:focus-visible {
+    outline: none;
+  }
+  .title a:focus-visible::after {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 6px;
+  }
+  .card:hover .title a {
+    color: var(--c-accent-strong);
+  }
+  .card:hover .media :global(img) {
+    scale: 1.025;
+  }
+  .pitch {
+    color: var(--c-muted);
+    max-width: 52ch;
+  }
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2xs) var(--space-m);
+  }
+  .role,
+  .team {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .role {
+    padding: 0.2em 0.6em;
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-s);
+  }
+  .team {
+    color: var(--c-muted);
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-2xs);
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+  .tags li:not(:last-child)::after {
+    content: '·';
+    margin-inline-start: var(--space-2xs);
+  }
+
+  @media (min-width: 48rem) {
+    .card--feature {
+      grid-template-columns: 1.35fr 1fr;
+      gap: var(--space-l);
+      align-items: center;
+    }
+    .card--feature .title {
+      font-size: var(--step-3);
+    }
+  }
+</style>

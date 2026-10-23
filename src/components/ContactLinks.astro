@@ -1,0 +1,53 @@
+---
+// Email / LinkedIn / GitHub as plain text links. Placeholder URLs render as TODO marks (dev only).
+import { site } from '../lib/data';
+import { isTodo } from '../lib/projects';
+
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const items = [
+  { label: 'Email', href: isTodo(site.email) ? site.email : `mailto:${site.email}`, external: false },
+  { label: 'LinkedIn', href: site.links.linkedin, external: true },
+  { label: 'GitHub', href: site.links.github, external: true },
+];
+---
+
+<ul role="list" class:list={['contact-links', className]}>
+  {
+    items.map((item) => (
+      <li>
+        {isTodo(item.href) ? (
+          <mark class="todo">{item.label}: {item.href}</mark>
+        ) : (
+          <a href={item.href} rel={item.external ? 'me noopener' : undefined}>
+            {item.label}
+            {item.external && <span aria-hidden="true">↗</span>}
+            {item.external && <span class="visually-hidden">(opens external site)</span>}
+          </a>
+        )}
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .contact-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-m);
+  }
+  a {
+    display: inline-flex;
+    gap: 0.3em;
+    min-height: 2.75rem;
+    align-items: center;
+    font-weight: 500;
+  }
+  a span[aria-hidden] {
+    color: var(--c-accent);
+    font-size: 0.85em;
+  }
+</style>
