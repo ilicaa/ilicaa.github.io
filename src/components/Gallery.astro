@@ -1,0 +1,129 @@
+---
+// Images and short looping clips. Each image links to a large version (zoom without JS).
+import { Picture, getImage } from 'astro:assets';
+import type { Project } from '../lib/projects';
+import { mediaUrl } from '../lib/media';
+
+type Item = Project['data']['gallery'][number];
+interface Props {
+  items: Item[];
+  projectId: string;
+  label?: string;
+}
+const { items, projectId, label = 'Gallery' } = Astro.props;
+
+const resolved = await Promise.all(
+  items.map(async (item) => {
+    if ('loop' in item) {
+      const poster = item.poster ? (await getImage({ src: item.poster, width: 1280, format: 'webp' })).src : undefined;
+      return { kind: 'loop' as const, item, url: mediaUrl(item.loop, projectId), poster };
+    }
+    const full = await getImage({ src: item.src, width: Math.min(item.src.width, 2000), format: 'webp' });
+    return { kind: 'image' as const, item, full: full.src };
+  }),
+);
+const single = items.length === 1;
+---
+
+{
+  items.length > 0 && (
+    <ul role="list" class:list={['gallery', { single }]} aria-label={label}>
+      {resolved.map((r) => (
+        <li>
+          <figure>
+            {r.kind === 'image' ? (
+              <a href={r.full} class="zoom">
+                <Picture
+                  src={r.item.src}
+                  alt={r.item.alt}
+                  formats={['avif', 'webp']}
+                  widths={[480, 800, 1200, 1600]}
+                  sizes={single ? '(min-width: 76rem) 72rem, 100vw' : '(min-width: 76rem) 36rem, (min-width: 40rem) 50vw, 100vw'}
+                  loading="lazy"
+                />
+                <span class="visually-hidden">(open full size)</span>
+              </a>
+            ) : (
+              <video
+                class="loop"
+                src={r.url}
+                poster={r.poster}
+                muted
+                loop
+                playsinline
+                controls
+                preload="none"
+                aria-label={r.item.alt}
+                data-loop
+              />
+            )}
+            {r.item.caption && <figcaption>{r.item.caption}</figcaption>}
+          </figure>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<script>
+  // Loops play only while visible, and never automatically under prefers-reduced-motion.
+  const motionOk = window.matchMedia('(prefers-reduced-motion: no-preference)');
+  const loops = document.querySelectorAll<HTMLVideoElement>('video[data-loop]');
+  if (motionOk.matches && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (e.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        }),
+      { threshold: 0.5 },
+    );
+    loops.forEach((v) => io.observe(v));
+  }
+</script>
+
+<style>
+  .gallery {
+    display: grid;
+    gap: var(--space-m);
+  }
+  @media (min-width: 40rem) {
+    .gallery:not(.single) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  figure {
+    display: grid;
+    gap: var(--space-2xs);
+  }
+  .zoom,
+  .loop {
+    display: block;
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: var(--c-surface);
+    outline: 1px solid var(--c-rule);
+    outline-offset: -1px;
+  }
+  .zoom :global(img) {
+    width: 100%;
+    transition: opacity var(--dur-fast);
+  }
+  .zoom:hover :global(img) {
+    opacity: 0.9;
+  }
+  .zoom:focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 3px;
+  }
+  .loop {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  figcaption {
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+</style>

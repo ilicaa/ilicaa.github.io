@@ -1,0 +1,355 @@
+---
+import { Picture } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import QuickFacts from '../../components/QuickFacts.astro';
+import Gallery from '../../components/Gallery.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import Metrics from '../../components/Metrics.astro';
+import Planning from '../../components/Planning.astro';
+import Todo from '../../components/Todo.astro';
+import '../../styles/prose.css';
+import { getProjects, projectUrl, TRACK_LABELS, isTodo, type Project } from '../../lib/projects';
+import { SECTION_DEFS, splitSections, highlightTodos, wrapTables, type SectionKey } from '../../lib/case-study';
+import { mediaUrl } from '../../lib/media';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: Project;
+  next: Project;
+}
+const { project, next } = Astro.props;
+const d = project.data;
+
+const { lead, sections, warnings } = splitSections(project.rendered?.html ?? '');
+for (const w of warnings) console.warn(`[case-study] content/projects/${project.id}.md: ${w}`);
+const clean = (html: string) => wrapTables(highlightTodos(html));
+
+const galleryFor = (key: SectionKey | 'media') => d.gallery.filter((g) => g.section === key);
+
+// A section renders only if it has prose or structured content. Nothing is filled in automatically.
+const rendered = SECTION_DEFS.map((def) => {
+  const prose = sections.get(def.key);
+  const hasBlocks =
+    (def.key === 'process' && (d.milestones.length > 0 || d.risks.length > 0 || !!d.tracking)) ||
+    (def.key === 'results' && d.metrics.length > 0) ||
+    galleryFor(def.key).length > 0;
+  return { ...def, prose, show: !!prose?.html.trim() || hasBlocks };
+}).filter((s) => s.show);
+
+const mediaItems = galleryFor('media');
+const showMedia = mediaItems.length > 0 || d.videos.length > 0;
+const documents = d.documents.map((doc) => ({ ...doc, url: mediaUrl(doc.file, project.id) }));
+const showLinks = !!(d.links.demo || d.links.repo || d.links.repoPrivate || d.links.other.length || documents.length);
+
+const toc = [
+  ...rendered.map((s) => ({ id: s.key, label: s.title })),
+  ...(showMedia ? [{ id: 'media', label: 'Media' }] : []),
+  ...(showLinks ? [{ id: 'links', label: 'Links' }] : []),
+];
+const pad = (n: number) => String(n).padStart(2, '0');
+const description = d.seoDescription ?? (isTodo(d.pitch) ? undefined : d.pitch);
+const ogImage = d.hero?.image ?? d.thumbnail;
+---
+
+<Base title={d.title} description={description} image={ogImage?.src} imageAlt={ogImage?.alt} type="article">
+  <article>
+    <header class="cs-hero">
+      <div class="wrap">
+        <p class="label crumbs">
+          <a href="/projects/">Projects</a>
+          <span aria-hidden="true">/</span>
+          {d.tracks.map((t) => TRACK_LABELS[t]).join(' · ')}
+        </p>
+        <h1>{d.title}</h1>
+        <p class="pitch"><Todo value={d.pitch} /></p>
+      </div>
+      <div class:list={['wrap', 'hero-grid', { 'no-media': !d.hero }]}>
+        {
+          d.hero && (
+            <div class="hero-media">
+              {d.hero.image ? (
+                <Picture
+                  src={d.hero.image.src}
+                  alt={d.hero.image.alt}
+                  formats={['avif', 'webp']}
+                  widths={[480, 800, 1200, 1600]}
+                  sizes="(min-width: 76rem) 46rem, (min-width: 56rem) 60vw, 100vw"
+                  loading="eager"
+                  fetchpriority="high"
+                />
+              ) : (
+                d.hero.video && <VideoEmbed {...d.hero.video} />
+              )}
+            </div>
+          )
+        }
+        <aside aria-label="Quick facts" class="facts">
+          <QuickFacts data={d} />
+        </aside>
+      </div>
+    </header>
+
+    {
+      toc.length > 1 && (
+        <nav class="wrap toc" aria-label="On this page">
+          <ol role="list">
+            {toc.map((item, i) => (
+              <li>
+                <a href={`#${item.id}`}>
+                  <span class="num" aria-hidden="true">
+                    {pad(i + 1)}
+                  </span>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    {
+      lead.trim() && (
+        <div class="wrap">
+          <div class="prose lead" set:html={clean(lead)} />
+        </div>
+      )
+    }
+
+    {
+      rendered.map((s, i) => (
+        <section id={s.key} class="cs-section" aria-labelledby={`${s.key}-heading`}>
+          <div class="wrap">
+            <p class="label num" aria-hidden="true">
+              {pad(i + 1)}
+            </p>
+            {s.prose ? (
+              <h2 id={`${s.key}-heading`} set:html={s.prose.titleHtml} />
+            ) : (
+              <h2 id={`${s.key}-heading`}>{s.title}</h2>
+            )}
+            {s.key === 'results' && <Metrics items={d.metrics} />}
+            {s.prose && <div class="prose" set:html={clean(s.prose.html)} />}
+            {s.key === 'process' && <Planning milestones={d.milestones} tracking={d.tracking} risks={d.risks} />}
+            {galleryFor(s.key).length > 0 && (
+              <div class="section-gallery">
+                <Gallery items={galleryFor(s.key)} projectId={project.id} label={`${s.title} images`} />
+              </div>
+            )}
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      showMedia && (
+        <section id="media" class="cs-section" aria-labelledby="media-heading">
+          <div class="wrap">
+            <p class="label num" aria-hidden="true">
+              {pad(rendered.length + 1)}
+            </p>
+            <h2 id="media-heading">Media</h2>
+            {d.videos.length > 0 && (
+              <div class="videos">
+                {d.videos.map((v) => (
+                  <VideoEmbed {...v} />
+                ))}
+              </div>
+            )}
+            {mediaItems.length > 0 && (
+              <div class="section-gallery">
+                <Gallery items={mediaItems} projectId={project.id} label="Media gallery" />
+              </div>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      showLinks && (
+        <section id="links" class="cs-section" aria-labelledby="links-heading">
+          <div class="wrap">
+            <p class="label num" aria-hidden="true">
+              {pad(rendered.length + (showMedia ? 2 : 1))}
+            </p>
+            <h2 id="links-heading">Links &amp; documents</h2>
+            <ul role="list" class="link-list">
+              {d.links.demo && (
+                <li>
+                  <a href={d.links.demo}>Play / demo</a>
+                </li>
+              )}
+              {d.links.repo && (
+                <li>
+                  <a href={d.links.repo}>Source code</a>
+                </li>
+              )}
+              {!d.links.repo && d.links.repoPrivate && <li class="muted">Source code: private repo — available on request</li>}
+              {d.links.other.map((l) => (
+                <li>
+                  <a href={l.url}>{l.label}</a>
+                </li>
+              ))}
+              {documents.map((doc) => (
+                <li>
+                  <a href={doc.url} download={`${d.title} - ${doc.label}.pdf`.replace(/[\\/:*?"<>|]/g, '')}>
+                    {doc.label}
+                  </a>
+                  <span class="file-type">PDF</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      next.id !== project.id && (
+        <nav class="wrap next" aria-label="Next project">
+          <p class="label">Next project</p>
+          <a href={projectUrl(next.id)}>
+            {next.data.title} <span aria-hidden="true">→</span>
+          </a>
+        </nav>
+      )
+    }
+  </article>
+</Base>
+
+<style>
+  .cs-hero {
+    padding-block: var(--space-2xl) var(--space-xl);
+  }
+  .crumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+  }
+  .crumbs a {
+    color: var(--c-accent);
+    text-decoration: none;
+  }
+  .crumbs a:hover {
+    text-decoration: underline;
+  }
+  h1 {
+    margin-block-start: var(--space-s);
+    max-width: 20ch;
+  }
+  .pitch {
+    margin-block-start: var(--space-s);
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    line-height: 1.5;
+    color: var(--c-muted);
+  }
+  .hero-grid {
+    display: grid;
+    gap: var(--space-l);
+    margin-block-start: var(--space-xl);
+    align-items: start;
+  }
+  @media (min-width: 56rem) {
+    .hero-grid:not(.no-media) {
+      grid-template-columns: minmax(0, 1.6fr) minmax(18rem, 1fr);
+    }
+    .hero-grid.no-media .facts {
+      max-width: var(--w-content);
+    }
+  }
+  .hero-media :global(img) {
+    width: 100%;
+    border-radius: var(--radius-m);
+  }
+
+  .toc {
+    margin-block-start: var(--space-l);
+    padding-block: var(--space-s);
+    border-block: 1px solid var(--c-rule);
+  }
+  .toc ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs) var(--space-l);
+  }
+  .toc a {
+    display: inline-flex;
+    gap: 0.5em;
+    align-items: baseline;
+    padding-block: var(--space-3xs);
+    font-size: var(--step--1);
+    text-decoration: none;
+    color: var(--c-muted);
+  }
+  .toc a:hover {
+    color: var(--c-text);
+  }
+  .num {
+    font-family: var(--ff-mono);
+    color: var(--c-accent);
+  }
+
+  .lead {
+    margin-block-start: var(--space-2xl);
+    font-size: var(--step-1);
+  }
+  .cs-section {
+    margin-block-start: var(--space-2xl);
+  }
+  .cs-section h2 {
+    margin-block: var(--space-2xs) var(--space-m);
+    max-width: 24ch;
+  }
+  .cs-section :global(.metrics) {
+    margin-block-end: var(--space-l);
+  }
+  .section-gallery,
+  .videos {
+    margin-block-start: var(--space-l);
+  }
+  .videos {
+    display: grid;
+    gap: var(--space-l);
+  }
+  @media (min-width: 56rem) {
+    .videos:has(> figure:nth-of-type(2)) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .link-list {
+    display: grid;
+    gap: var(--space-xs);
+    font-size: var(--step-1);
+  }
+  .file-type {
+    margin-inline-start: var(--space-2xs);
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+  .muted {
+    color: var(--c-muted);
+  }
+  .next {
+    margin-block-start: var(--space-3xl);
+    padding-block-start: var(--space-l);
+    border-top: 1px solid var(--c-rule);
+  }
+  .next a {
+    display: inline-block;
+    margin-block-start: var(--space-2xs);
+    font-family: var(--ff-display);
+    font-size: var(--step-4);
+    line-height: var(--lh-tight);
+    text-decoration: none;
+  }
+</style>

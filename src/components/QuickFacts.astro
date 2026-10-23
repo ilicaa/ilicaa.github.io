@@ -1,0 +1,149 @@
+---
+// Shows only what's in the frontmatter — never inferred.
+import StatusBadge from './StatusBadge.astro';
+import Todo from './Todo.astro';
+import type { Project } from '../lib/projects';
+
+interface Props {
+  data: Project['data'];
+}
+const { role, contributions, credits, teamSize, duration, tools, status, links } = Astro.props.data;
+---
+
+<dl class="facts">
+  <div class="wide">
+    <dt>Role</dt>
+    <dd><Todo value={role} /></dd>
+  </div>
+  <div class="wide">
+    <dt>My contributions</dt>
+    <dd>
+      <ul role="list" class="contribs">{contributions.map((c) => <li><Todo value={c} /></li>)}</ul>
+    </dd>
+  </div>
+  {
+    credits.length > 0 && (
+      <div class="wide">
+        <dt>Team credits</dt>
+        <dd>
+          <ul role="list">
+            {credits.map((c) => (
+              <li>
+                <Todo value={c.what} /> — <Todo value={c.who} />
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    )
+  }
+  {
+    teamSize !== undefined && (
+      <div>
+        <dt>Team size</dt>
+        <dd>
+          <Todo value={teamSize} />
+        </dd>
+      </div>
+    )
+  }
+  {
+    duration && (
+      <div>
+        <dt>Duration</dt>
+        <dd>
+          <Todo value={duration} />
+        </dd>
+      </div>
+    )
+  }
+  <div>
+    <dt>Status</dt>
+    <dd><StatusBadge status={status} /></dd>
+  </div>
+  {
+    tools.length > 0 && (
+      <div class="wide">
+        <dt>Tools</dt>
+        <dd>{tools.join(', ')}</dd>
+      </div>
+    )
+  }
+  {
+    (links.demo || links.repo || links.repoPrivate || links.other.length > 0) && (
+      <div class="wide">
+        <dt>Links</dt>
+        <dd>
+          <ul role="list" class="links">
+            {links.demo && (
+              <li>
+                <a href={links.demo}>Play / demo</a>
+              </li>
+            )}
+            {links.repo && (
+              <li>
+                <a href={links.repo}>Source code</a>
+              </li>
+            )}
+            {!links.repo && links.repoPrivate && <li class="muted">Private repo — available on request</li>}
+            {links.other.map((l) => (
+              <li>
+                <a href={l.url}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    )
+  }
+</dl>
+
+<style>
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-m) var(--space-m);
+    padding: var(--space-m);
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-m);
+    background: var(--c-surface);
+  }
+  .wide {
+    grid-column: 1 / -1;
+  }
+  dt {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  dd {
+    margin-block-start: var(--space-3xs);
+  }
+  .contribs li {
+    position: relative;
+    padding-inline-start: 1.1em;
+  }
+  .contribs li + li {
+    margin-block-start: var(--space-3xs);
+  }
+  .contribs li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.45em;
+    height: 1px;
+    background: var(--c-accent);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3xs) var(--space-m);
+  }
+  .muted {
+    color: var(--c-muted);
+  }
+</style>

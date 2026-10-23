@@ -1,0 +1,124 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getProjects, TRACK_LABELS, type Track } from '../../lib/projects';
+import { TRACKS } from '../../content.config';
+
+const projects = await getProjects();
+const blurbs: Record<Track, string> = {
+  production: 'Planning, milestones, risk and team coordination.',
+  design: 'Systems, levels, progression and documentation.',
+  'technical-qa': 'Engineering, tools and testing.',
+};
+const tracks = TRACKS.map((key) => ({
+  key,
+  label: TRACK_LABELS[key],
+  blurb: blurbs[key],
+  items: projects.filter((p) => p.data.tracks.includes(key)),
+})).filter((t) => t.items.length > 0);
+---
+
+<Base title="Projects" description="Case studies grouped by Production, Design, and Technical & QA work.">
+  <header class="wrap intro">
+    <h1>Projects</h1>
+    <p class="lede">Grouped by the kind of work. A project can appear in more than one track.</p>
+    <nav aria-label="Tracks">
+      <ul role="list" class="tracks">
+        {
+          tracks.map((t) => (
+            <li>
+              <a href={`#${t.key}`}>
+                {t.label} <span class="count">{t.items.length}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </header>
+
+  {
+    tracks.map((t, ti) => (
+      <section id={t.key} class="wrap track" aria-labelledby={`${t.key}-heading`}>
+        <div class="track-head">
+          <h2 id={`${t.key}-heading`}>{t.label}</h2>
+          <p>{t.blurb}</p>
+        </div>
+        <ul role="list" class="grid">
+          {t.items.map((p, i) => (
+            <li class={ti === 0 && i < 2 ? undefined : 'reveal'}>
+              <ProjectCard project={p} details eager={ti === 0 && i === 0} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .intro {
+    padding-block: var(--space-2xl) var(--space-l);
+  }
+  .lede {
+    margin-block-start: var(--space-s);
+    color: var(--c-muted);
+    font-size: var(--step-1);
+  }
+  .tracks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xs);
+    margin-block-start: var(--space-l);
+  }
+  .tracks a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    min-height: 2.75rem;
+    padding: 0.4em 0.9em;
+    border: 1px solid var(--c-rule);
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .tracks a:hover {
+    border-color: var(--c-accent);
+    color: var(--c-text);
+  }
+  .count {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    color: var(--c-accent);
+  }
+  .track {
+    margin-block-start: var(--space-2xl);
+    scroll-margin-top: var(--space-l);
+  }
+  .track-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2xs) var(--space-m);
+    padding-block-end: var(--space-s);
+    margin-block-end: var(--space-l);
+    border-bottom: 1px solid var(--c-rule);
+  }
+  .track-head p {
+    color: var(--c-muted);
+  }
+  .grid {
+    display: grid;
+    gap: var(--space-xl) var(--space-l);
+  }
+  @media (min-width: 40rem) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 72rem) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

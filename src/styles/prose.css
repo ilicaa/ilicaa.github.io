@@ -1,0 +1,69 @@
+/* Long-form text rendered from markdown (case studies, About). */
+.prose {
+  max-width: var(--measure);
+}
+.prose > * + * {
+  margin-block-start: 1em;
+}
+.prose h3 {
+  margin-block-start: 2em;
+  font-size: var(--step-1);
+}
+.prose h3 + * {
+  margin-block-start: 0.5em;
+}
+.prose ul,
+.prose ol {
+  padding-inline-start: 1.25em;
+}
+.prose li + li {
+  margin-block-start: 0.4em;
+}
+.prose li::marker {
+  color: var(--c-accent);
+}
+.prose blockquote {
+  padding-inline-start: var(--space-m);
+  border-inline-start: 2px solid var(--c-accent);
+  font-family: var(--ff-display);
+  font-size: var(--step-1);
+  line-height: 1.45;
+}
+.prose code {
+  font-family: var(--ff-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-s);
+  background: var(--c-surface-2);
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--c-rule);
+}
+/* Tables (e.g. tuning values, balancing) scroll sideways on phones instead of breaking the layout. */
+.prose .table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.prose table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.prose th,
+.prose td {
+  padding: var(--space-2xs) var(--space-s);
+  border-bottom: 1px solid var(--c-rule);
+  text-align: start;
+  vertical-align: top;
+}
+.prose th {
+  font-family: var(--ff-mono);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.prose strong {
+  color: var(--c-text);
+}

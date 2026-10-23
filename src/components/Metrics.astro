@@ -1,0 +1,62 @@
+---
+// Pull-out numbers. Rendered only from real values in the frontmatter `metrics` list.
+import Todo from './Todo.astro';
+
+interface Props {
+  items: { value: string; label: string; note?: string }[];
+}
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <dl class="metrics">
+      {items.map((m) => (
+        <div>
+          <dt>
+            <Todo value={m.label} />
+          </dt>
+          <dd class="value">
+            <Todo value={m.value} />
+          </dd>
+          {m.note && <dd class="note">{m.note}</dd>}
+        </div>
+      ))}
+    </dl>
+  )
+}
+
+<style>
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--space-l);
+    padding-block: var(--space-l);
+    border-block: 1px solid var(--c-rule);
+  }
+  .metrics div {
+    display: flex;
+    flex-direction: column;
+  }
+  /* Number first visually; label stays first in the DOM so it's read as "label: value". */
+  dt {
+    order: 2;
+    margin-block-start: var(--space-2xs);
+    font-weight: 500;
+  }
+  .value {
+    order: 1;
+    font-family: var(--ff-display);
+    font-size: var(--step-5);
+    font-weight: 400;
+    line-height: 1;
+    color: var(--c-accent);
+    font-variant-numeric: lining-nums;
+  }
+  .note {
+    order: 3;
+    margin-block-start: var(--space-3xs);
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+</style>

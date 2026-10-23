@@ -1,0 +1,129 @@
+---
+// Milestones, how work was tracked, and risks/mitigations — the production evidence block.
+import type { Project } from '../lib/projects';
+
+interface Props {
+  milestones: Project['data']['milestones'];
+  tracking?: string;
+  risks: Project['data']['risks'];
+}
+const { milestones, tracking, risks } = Astro.props;
+---
+
+{
+  milestones.length > 0 && (
+    <div class="block">
+      <h3 class="label">Milestones</h3>
+      <ol role="list" class="timeline">
+        {milestones.map((m) => (
+          <li class:list={{ done: m.done }}>
+            <span class="dot" aria-hidden="true" />
+            {m.date && <span class="date">{m.date}</span>}
+            <span class="name">{m.name}</span>
+            {m.done !== undefined && <span class="visually-hidden">{m.done ? '(completed)' : '(not completed)'}</span>}
+            {m.note && <span class="note">{m.note}</span>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
+{
+  tracking && (
+    <div class="block">
+      <h3 class="label">How work was tracked</h3>
+      <p class="tracking">{tracking}</p>
+    </div>
+  )
+}
+
+{
+  risks.length > 0 && (
+    <div class="block">
+      <h3 class="label">Risks &amp; mitigations</h3>
+      <ul role="list" class="risks">
+        {risks.map((r) => (
+          <li>
+            <dl>
+              <dt>Risk</dt>
+              <dd>{r.risk}</dd>
+              <dt>Mitigation</dt>
+              <dd>{r.mitigation}</dd>
+            </dl>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style>
+  .block {
+    margin-block-start: var(--space-xl);
+  }
+  .block > h3 {
+    margin-block-end: var(--space-s);
+  }
+  .timeline {
+    border-inline-start: 1px solid var(--c-rule);
+    margin-inline-start: 0.4rem;
+  }
+  .timeline li {
+    position: relative;
+    display: grid;
+    padding: 0 0 var(--space-m) var(--space-m);
+  }
+  .dot {
+    position: absolute;
+    left: calc(-0.4rem - 0.5px);
+    top: 0.45em;
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-muted);
+    background: var(--c-bg);
+  }
+  .done .dot {
+    border-color: var(--c-accent);
+    background: var(--c-accent);
+  }
+  .date {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    color: var(--c-muted);
+  }
+  .name {
+    font-weight: 600;
+  }
+  .note,
+  .tracking {
+    color: var(--c-muted);
+    max-width: var(--measure);
+  }
+  .risks {
+    display: grid;
+    gap: var(--space-s);
+  }
+  @media (min-width: 48rem) {
+    .risks {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .risks li {
+    padding: var(--space-m);
+    border: 1px solid var(--c-rule);
+    border-radius: var(--radius-m);
+  }
+  .risks dt {
+    font-family: var(--ff-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .risks dt:nth-of-type(2) {
+    margin-block-start: var(--space-xs);
+    color: var(--c-accent);
+  }
+</style>
