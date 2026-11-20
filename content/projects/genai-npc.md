@@ -6,7 +6,6 @@ tracks: [production, technical-qa]
 tags: [Senior project, LLM, RAG, Unity, FastAPI]
 order: 1
 
-# Quick facts — shown exactly as written. List only what you personally did.
 role: Team lead, Backend Engineer (Unity & LLM Integration)
 contributions:
   - Pitched the concept and led the team.

@@ -6,10 +6,7 @@ tracks: [design]
 tags: [Horror, First-person, GDD, Level design]
 order: 3
 
-# Quick facts — shown exactly as written. List only what you personally did.
 role: Game Designer
-# Your draft wording from the brief, to finalize:
-# "I designed most of the gameplay and early levels; narrative and original concept are by a teammate."
 contributions:
   - Designed and finalized the core loop and core systems.
 credits:
@@ -18,7 +15,6 @@ teamSize: 2
 duration: "Mar – May 2026"
 tools: []
 
-# See content/projects/genai-npc.md for commented examples of every media/planning field.
 ---
 
 ## Overview and goals

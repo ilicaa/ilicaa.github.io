@@ -6,7 +6,6 @@ tracks: [production]
 tags: []
 order: 2
 
-# Quick facts — shown exactly as written. List only what you personally did.
 role: Producer
 contributions:
   - Planned and dated whole work plan.
@@ -38,7 +37,6 @@ gallery:            # section: overview | role | process | decisions | results |
     section: process
   
 thumbnail: { src: ../media/anima-1/anima1-concept2.jpg, alt: "Anima-1" }
-# See content/projects/genai-npc.md for commented examples of every media/planning field.
 ---
 
 ## Overview and goals
