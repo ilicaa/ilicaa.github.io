@@ -200,7 +200,7 @@ const ogImage = d.hero?.image ?? d.thumbnail;
               ))}
               {documents.map((doc) => (
                 <li>
-                  <a href={doc.url} download={`${d.title} - ${doc.label}.pdf`.replace(/[\\/:*?"<>|]/g, '')}>
+                  <a href={doc.url} target="_blank" rel="noopener">
                     {doc.label}
                   </a>
                   <span class="file-type">PDF</span>
